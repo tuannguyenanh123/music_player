@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player</title>
+    <link rel="stylesheet" href="./assets/css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w==" crossorigin="anonymous" />
+    <link rel="shortcut icon" href="faviconJTP.ico" type="image/x-icon">  
+
+</head>
+<body>
+    <div class="player">
+        <!-- dashboard -->
+        <div class="dashboard">
+            <!-- header -->
+            <header class="header">
+                <h4>Now playing:</h4>
+                <h2>The Weeknd - Starboy ft. Daft Punk</h2>
+            </header>
+             <!-- CD -->
+            <div class="cd">
+                <div class="cd-thumb" style="background-image: url('https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/ae/aee2e219ea86c211cb4962982bc9ebe0ba8fbe0e_full.jpg')">
+                </div>
+            </div>
+             <!-- Control -->
+            <div class="control">
+                <div class="btn btn-repeat">
+                    <i class="fas fa-redo"></i>
+                </div>
+                <div class="btn btn-prev">
+                    <i class="fas fa-step-backward"></i>
+                </div>
+                <div class="btn btn-toggle-play">
+                    <i class="fas fa-pause icon-pause"></i>
+                    <i class="fas fa-play icon-play"></i>
+                </div>
+                <div class="btn btn-next">
+                    <i class="fas fa-step-forward"></i>
+                </div>
+                <div class="btn btn-random">
+                    <i class="fas fa-random"></i>
+                </div>
+            </div>
+            <input id="progress" class="progress" type="range" value="0" step="1" min="0" max="100">
+
+            <audio id="audio" src=""></audio>
+        </div>
+        <!-- playlist -->
+        <div class="playlist">
+            <!-- <div class="song">
+              <div class="thumb" style="background-image: url('https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/ae/aee2e219ea86c211cb4962982bc9ebe0ba8fbe0e_full.jpg')">
+              </div>
+              <div class="body">
+                <h3 class="title">A Lonely Night</h3>
+                <p class="author">The Weeknd</p>
+              </div>
+              <div class="option">
+                <i class="fas fa-ellipsis-h"></i>
+              </div>
+            </div>
+            <div class="song">
+                <div class="thumb" style="background-image: url('https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/ae/aee2e219ea86c211cb4962982bc9ebe0ba8fbe0e_full.jpg')">
+                </div>
+                <div class="body">
+                    <h3 class="title">Acquainted</h3>
+                    <p class="author">The Weeknd</p>
+                </div>
+                <div class="option">
+                    <i class="fas fa-ellipsis-h"></i>
+                </div>
+            </div>
+            <div class="song">
+                <div class="thumb" style="background-image: url('https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/ae/aee2e219ea86c211cb4962982bc9ebe0ba8fbe0e_full.jpg')">
+                </div>
+                <div class="body">
+                    <h3 class="title">Belong to the World</h3>
+                    <p class="author">The Weeknd</p>
+                </div>
+                <div class="option">
+                    <i class="fas fa-ellipsis-h"></i>
+                </div>
+            </div>
+            <div class="song">
+                <div class="thumb" style="background-image: url('https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/ae/aee2e219ea86c211cb4962982bc9ebe0ba8fbe0e_full.jpg')">
+                </div>
+                <div class="body">
+                    <h3 class="title">A Lonely Night</h3>
+                    <p class="author">The Weeknd</p>
+                </div>
+                <div class="option">
+                    <i class="fas fa-ellipsis-h"></i>
+                </div>
+            </div> -->
+        </div>
+    </div>
+    <script>
+
+        const PLAYER_STORAGE_KEY = 'Play_music'
+
+        const $ = document.querySelector.bind(document);
+        const $$ = document.querySelectorAll.bind(document);
+        const heading = $('.header h2');
+        const cdThumb = $('.cd-thumb');
+        const player = $('.player');
+        const audio = $('#audio');
+        const cd = $('.cd');
+        const next__Song = $('.btn-next');
+        const prev__song = $('.btn-prev');
+        const random_Btn = $('.btn-random');
+        const repeat_Btn = $('.btn-repeat');
+        const playList = $('.playlist');
+        const cdWidth = cd.offsetWidth;
+        /*bấm vào nút play*/
+        const playBtn = $('.btn-toggle-play');
+        const progress = $('#progress');
+        const app = {
+            arraySong: [],
+            currentIndex: 0,
+            isPlaying: false,
+            isRandom: false,
+            isRepeat: false,
+            config: JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)) || {},
+            songs: [
+            {
+                name: 'LMLY',
+                single: 'Jack Wang',
+                path: './assets/music/song4.mp3',
+                img: './assets/img/jswang.jpg'
+            },
+            {
+                name: 'The Best Song',
+                single: 'Charli Puth',
+                path: './assets/music/song1.mp3',
+                img: './assets/img/charli puth.jpg'
+            },
+            {
+                name: 'Host',
+                single: 'Jackson Wang',
+                path: './assets/music/song3.mp3',
+                img: './assets/img/jswang.jpg'
+            },
+            {
+                name: 'A Lonely Night',
+                single: 'The Weekend',
+                path: './assets/music/song4.mp3',
+                img: './assets/img/jswang.jpg'
+            },
+            {
+                name: 'LMLY',
+                single: 'Jackson Wang',
+                path: './assets/music/song5.mp3',
+                img: './assets/img/charli puth.jpg'
+            },
+            {
+                name: 'A Lonely Night',
+                single: 'The Weekend',
+                path: './assets/music/song6.mp3',
+                img: './assets/img/imgsong1.jpg'
+            }
+            ],
+            setConfig: function(key,value) {
+                this.config[key] = value;
+                localStorage.setItem(PLAYER_STORAGE_KEY,JSON.stringify(this.config));
+            },
+            defineProperties: function(){
+                Object.defineProperty(this,'currentSong',{
+                    get: function(){
+                        return this.songs[this.currentIndex];
+                    }
+                })
+            },
+            handleEvent: function()
+            {
+                /*zoom cd*/
+                const _this= this;
+
+                document.onscroll = function() {
+                    const scrollTop = document.documentElement.scrollTop || window.scrollY;
+                    const newcdWidth = cdWidth - scrollTop;
+                    cd.style.width = newcdWidth > 0 ? newcdWidth + 'px' : 0; 
+                    cd.style.opacity = newcdWidth / cdWidth ; 
+                }
+                /*xử lí khi click play*/
+                playBtn.onclick = function(){
+                    if (_this.isPlaying) {
+                        audio.pause()  
+                    }
+                    else{
+                        audio.play()
+                    }
+                }
+                /*khi song play thì lắng nghe*/
+                audio.onplay = function(){
+                    _this.isPlaying = true
+                    player.classList.add('playing')
+                    cdAnimate.play()
+                }
+               /*khi song bị pause*/
+                audio.onpause = function(){
+                    _this.isPlaying = false
+                    player.classList.remove('playing')
+                    cdAnimate.pause()
+                }
+                /*khi tiến độ bài hát thay đổi*/
+                audio.ontimeupdate = function(){
+                    if(audio.duration)
+                    {
+                        const progressPercent = Math.floor(audio.currentTime / audio.duration * 100);
+                        progress.value = progressPercent;
+                    }
+                }
+                /*xử lí khi tua*/
+                progress.oninput = function(e) {
+                    audio.pause();
+                    setTimeout(() => {
+                      audio.play();
+                    },500);
+                    //Lấy ra thời gian sau khi click tua
+                    const seekTime = e.target.value * (audio.duration / 100);
+                    audio.currentTime = seekTime;
+                  };
+                /*xử lí cd quay và dừng*/
+                const cdAnimate = cdThumb.animate([
+                    {transform: 'rotate(360deg)'}
+                ],{
+                    duration: 10000,/*10s*/
+                    iterations: Infinity
+                })
+                cdAnimate.pause()
+
+                // khi next bài hát
+                next__Song.onclick = function(){
+                    if(_this.isRandom)
+                    {
+                        _this.playRandomSong()
+                    }
+                    else{
+                        _this.nextSong()
+                    }
+                    audio.play()
+                    _this.scrollToActiveSong()
+
+                }
+                prev__song.onclick = function(){
+                    if(_this.isRandom)
+                    {
+                        _this.playRandomSong()
+                    }
+                    else{
+                        _this.PrevSong()
+                    }
+                    audio.play()
+                }
+                // khi click btn random song
+                random_Btn.onclick = function(e){
+                    _this.isRandom = !_this.isRandom;
+                    random_Btn.classList.toggle('active', _this.isRandom);
+                    _this.setConfig('isRandom',_this.isRandom);
+                }
+                // xử lí khi click vào btn repeat
+                repeat_Btn.onclick = function(e){
+                    _this.isRepeat = !_this.isRepeat;
+                    repeat_Btn.classList.toggle('active',_this.isRepeat)
+                    _this.setConfig('isRepeat',_this.isRepeat);
+                }
+                //next and repeat while ended song
+                audio.onended = function(){
+                    if(_this.isRepeat)
+                    {
+                        audio.play()
+                    }
+                    else{
+                        next__Song.click();
+                    }
+                }
+                //lắng nghe click vào playlist
+                playList.onclick = function(e){
+                    // xử lí khi click vào song chưa active
+                    const getSong = e.target.closest('.song:not(.active)');
+                    if(getSong|| e.target.closest('.option')){
+                        if(getSong)
+                        {
+                           _this.currentIndex = getSong.getAttribute('data-index');
+                           _this.loadCurrentSong()
+                           audio.play()
+                        }
+                        //xử lí khi click vào song option
+                        if(e.target.closest('.option'))
+                        {
+
+                        }
+                    }
+                }
+            },
+
+            render: function()
+            {
+               const htmls = this.songs.map((item,index) =>
+               {
+                   return `
+                    <div data-index="${index}" class="song ${
+                        index === this.currentIndex ? 'active' : ''
+                      }">
+                        <div class="thumb" style="background-image: url('${item.img}')">
+                        </div>
+                        <div class="body">
+                            <h3 class="title">${item.name}</h3>
+                            <p class="author">${item.single}</p>
+                        </div>
+                        <div class="option">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </div>
+                    </div>`
+               })
+               playList.innerHTML = htmls.join('\n');
+            },
+            loadConfig: function(){
+                this.isRandom = this.config.isRandom;
+                this.isRepeat = this.config.isRepeat;
+            },
+            nextSong: function(){
+                this.currentIndex++
+                if(this.currentIndex >= this.songs.length)
+                {
+                    this.currentIndex = 0;
+                }
+                this.loadCurrentSong()
+            },
+            PrevSong: function(){
+                this.currentIndex--
+                if(this.currentIndex < 0)
+                {
+                    this.currentIndex = this.songs.length - 1;
+                }
+                this.loadCurrentSong()
+            },
+            playRandomSong: function(){
+                let newIndex 
+                this.arraySong.push(this.currentIndex)
+                
+                do{
+                    newIndex = Math.floor(Math.random() * this.songs.length)
+                    if(this.arraySong.length ==  this.songs.length)
+                {
+                    this.arraySong = []
+                }
+                }
+                while(this.arraySong.includes(newIndex));
+                this.currentIndex = newIndex;
+                this.loadCurrentSong()
+
+            },
+            scrollToActiveSong: function()
+            {
+                setTimeout(() => {
+                    $('.song.active').scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+                },300)
+            },
+            loadCurrentSong: function(){
+                heading.textContent = this.currentSong.name;
+                cdThumb.style.backgroundImage = `url('${this.currentSong.img}')`;
+                audio.src = this.currentSong.path; 
+                if($('.song.active'))
+                {
+                    $('.song.active').classList.remove('active');
+                }
+                $$('.song').forEach((song) =>
+                {
+                    if(song.getAttribute('data-index') == this.currentIndex) {
+                        song.classList.add('active');
+                    }
+                })
+            },
+            start: function()
+            {
+                //đọc từ localStorage ra xong lưu vào config rồi loadconfig
+                this.loadConfig()
+                /*định nghĩa thuộc tính cho obj*/
+                this.defineProperties()
+                this.handleEvent()
+                this.loadCurrentSong()
+                this.render()
+                random_Btn.classList.toggle('active', this.isRandom)
+                repeat_Btn.classList.toggle('active',this.isRepeat)
+
+            }
+        }
+        app.start()
+    </script>
+</body>
+</html>
